@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nanath Temperatura</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #e6f7ff;
+      color: #003366;
+    }
+
+    h1 {
+      text-align: center;
+      color: #004080;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      border: 1px solid #b3d9ff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #004080;
+      color: #ffffff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f9ff;
+    }
+
+    tr:hover {
+      background-color: #d6ebff;
+    }
+
+    .loading {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      color: #004080;
+    }
+
+    footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 14px;
+      color: #004080;
+    }
+  </style>
+</head>
+<body>
+  <h1>Nanath Temperatura</h1>
+  <div class="loading" id="loading">Carregando dados...</div>
+  <table id="data-table" style="display: none;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Data e Hora</th>
+        <th>Temperatura (°C)</th>
+        <th>Umidade (%)</th>
+      </tr>
+    </thead>
+    <tbody id="data-body">
+      <!-- Os dados serão inseridos dinamicamente -->
+    </tbody>
+  </table>
+
+  <footer>
+    &copy; 2024 Nanath Monitoramento. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    async function fetchData() {
+      const loading = document.getElementById('loading');
+      const dataTable = document.getElementById('data-table');
+      const dataBody = document.getElementById('data-body');
+
+      try {
+        // Fazendo a requisição para o backend
+        const response = await fetch('http://localhost:3031/data');
+        if (!response.ok) throw new Error('Erro ao buscar os dados.');
+
+        const data = await response.json();
+
+        // Limpando o estado de carregamento
+        loading.style.display = 'none';
+        dataTable.style.display = 'table';
+
+        // Preenchendo a tabela com os dados
+        data.forEach(item => {
+          const row = document.createElement('tr');
+
+          row.innerHTML = `
+            <td>${item.id}</td>
+            <td>${new Date(item.date).toLocaleString()}</td>
+            <td>${item.temp} °C</td>
+            <td>${item.hmd} %</td>
+          `;
+
+          dataBody.appendChild(row);
+        });
+      } catch (error) {
+        loading.textContent = 'Erro ao carregar os dados.';
+        console.error(error);
+      }
+    }
+
+    // Carregar os dados quando a página for aberta
+    fetchData();
+  </script>
+</body>
+</html>
